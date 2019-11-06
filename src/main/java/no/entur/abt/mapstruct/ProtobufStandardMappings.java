@@ -6,12 +6,15 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Timestamp;
 
 @Mapper
 public interface ProtobufStandardMappings {
+
+	ProtobufStandardMappings INSTANCE = Mappers.getMapper(ProtobufStandardMappings.class);
 
 	default ByteString mapByteString(byte[] array) {
 		return ByteString.copyFrom(array);
@@ -49,7 +52,7 @@ public interface ProtobufStandardMappings {
 		return instant == null ? null : instant.toEpochMilli();
 	}
 
-	default Timestamp map(Instant i) {
+	default Timestamp mapToTimestamp(Instant i) {
 		if (i == null || i.getEpochSecond() == 0) {
 			return null;
 		}
@@ -61,18 +64,18 @@ public interface ProtobufStandardMappings {
 			return null;
 		}
 		Instant instant = Instant.ofEpochMilli(instance);
-		return map(instant);
+		return mapToTimestamp(instant);
 	}
 
 	default Duration mapDuration(com.google.protobuf.Duration t) {
 		return Duration.ofSeconds(t.getSeconds(), t.getNanos());
 	}
 
-	default com.google.protobuf.Duration map(Duration t) {
+	default com.google.protobuf.Duration mapDuration(Duration t) {
 		return com.google.protobuf.Duration.newBuilder().setSeconds(t.toSeconds()).setNanos(t.toSecondsPart()).build();
 	}
 
-	default com.google.type.Date map(LocalDate t) {
+	default com.google.type.Date mapLocalDate(LocalDate t) {
 		return com.google.type.Date.newBuilder().setYear(t.getYear()).setMonth(t.getMonthValue()).setDay(t.getDayOfMonth()).build();
 	}
 
@@ -80,7 +83,7 @@ public interface ProtobufStandardMappings {
 		return LocalDate.of(t.getYear(), t.getMonth(), t.getDay());
 	}
 
-	default com.google.type.TimeOfDay map(LocalTime t) {
+	default com.google.type.TimeOfDay mapLocalTime(LocalTime t) {
 		return com.google.type.TimeOfDay.newBuilder().setHours(t.getHour()).setMinutes(t.getMinute()).setSeconds(t.getSecond()).setNanos(t.getNano()).build();
 	}
 

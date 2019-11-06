@@ -1,0 +1,204 @@
+# Java Gradle CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-java/ for more details
+#
+version: 2.1
+
+aliases:
+  - &downstream_builds
+    name: Trigger downstream builds
+    command: |
+      echo 'export CIRCLE_API_TOKEN="$CIRCLE_API_USER_TOKEN"' >> $BASH_ENV
+      /tools/downstream_single_trigger.sh "bitbucket/enturas/abt-core" "master"
+      /tools/downstream_single_trigger.sh "bitbucket/enturas/abt-referencedata" "master"
+      /tools/downstream_single_trigger.sh "bitbucket/enturas/abt-inspection-lib "master"
+
+  - &sonar-scan
+    command: |
+      mvn sonar:sonar \
+        -Dsonar.projectKey=enturas_${CIRCLE_PROJECT_REPONAME} \
+        -Dsonar.organization=${SONAR_ORG} \
+        -Dsonar.projectName=${CIRCLE_PROJECT_REPONAME} \
+        -Dsonar.host.url=https://sonarcloud.io \
+        -Dsonar.login=${ENTUR_SONAR_PASSWORD}
+
+  - &maven-settings-file
+      "\"<settings xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.1.0 http://maven.apache.org/xsd/settings-1.1.0.xsd' xmlns='http://maven.apache.org/SETTINGS/1.1.0'
+            xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'>
+          <servers>
+            <server>
+              <username>$entur_artifactory_user</username>
+              <password>$entur_artifactory_password</password>
+              <id>central</id>
+            </server>
+            <server>
+              <username>$entur_artifactory_user</username>
+              <password>$entur_artifactory_password</password>
+              <id>snapshots</id>
+            </server>
+          </servers>
+          <profiles>
+      <profile>
+        <repositories>
+          <repository>
+            <snapshots>
+              <enabled>false</enabled>
+            </snapshots>
+            <id>central</id>
+            <name>entur-team-kontobasert-billettering-release</name>
+            <url>https://entur2.jfrog.io/entur2/entur-team-kontobasert-billettering-release</url>
+          </repository>
+          <repository>
+            <snapshots />
+            <id>snapshots</id>
+            <name>entur-team-kontobasert-billettering-snapshot</name>
+            <url>https://entur2.jfrog.io/entur2/entur-team-kontobasert-billettering-snapshot</url>
+          </repository>
+        </repositories>
+        <pluginRepositories>
+          <pluginRepository>
+            <snapshots>
+              <enabled>false</enabled>
+            </snapshots>
+            <id>central</id>
+            <name>entur-team-kontobasert-billettering-release</name>
+            <url>https://entur2.jfrog.io/entur2/entur-team-kontobasert-billettering-release</url>
+          </pluginRepository>
+          <pluginRepository>
+            <snapshots />
+            <id>snapshots</id>
+            <name>entur-team-kontobasert-billettering-snapshot</name>
+            <url>https://entur2.jfrog.io/entur2/entur-team-kontobasert-billettering-snapshot</url>
+          </pluginRepository>
+        </pluginRepositories>
+        <id>artifactory</id>
+      </profile>
+          </profiles>
+          <activeProfiles>
+            <activeProfile>artifactory</activeProfile>
+          </activeProfiles>
+        </settings>\""
+
+
+  - &java-container-config
+    docker:
+      - image: circleci/openjdk:11-jdk
+
+  - &circleci-container-config
+    docker:
+      - image: eu.gcr.io/carbon-1287/circleci-toolbox-image
+        auth:
+          username: _json_key
+          password: $GCLOUD_SERVICE_KEY
+
+commands:
+  generate-maven-settings-file:
+    parameters:
+      settings-file:
+        type: string
+    steps:
+      - run:
+          name: Generate Maven Settings File
+          command: |
+            mkdir -p ~/.m2
+            echo -e << parameters.settings-file >> > ~/.m2/settings.xml
+  send-slack-message:
+    parameters:
+      payload:
+        type: string
+    steps:
+      - run:
+          name: Sending message to Slack
+          command: |
+            curl -X POST -H 'Content-type: application/json' --data << parameters.payload >> $SLACK_WEBHOOK
+
+jobs:
+  build:
+    <<: *java-container-config
+
+    working_directory: ~/repo
+
+    environment:
+      MAVEN_OPTS: -Xmx1024m
+
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - cache-dependencies-{{ checksum "pom.xml" }}
+            - cache-dependencies-abt-referencedata-11012019
+
+      - generate-maven-settings-file:
+          settings-file: *maven-settings-file
+
+      - run: mvn clean verify
+
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: cache-dependencies-{{ checksum "pom.xml" }}
+
+      - run: mvn deploy -DskipTests
+
+      - persist_to_workspace:
+          root: .
+          paths:
+            - target/
+
+      - store_artifacts:
+          path: target/dependency-check-report.html
+
+      - store_artifacts:
+          path: target/dependency-check-vulnerability.html
+
+  postBuild:
+    <<: *circleci-container-config
+
+    steps:
+      - run: *downstream_builds
+
+  sonar:
+    <<: *java-container-config
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - restore_cache:
+          keys:
+            - cache-dependencies-{{ checksum "pom.xml" }}
+            - cache-dependencies-18012019
+
+      - run: *sonar-scan
+
+
+workflows:
+  version: 2
+  nightly-sonar-analysis:
+    triggers:
+      - schedule:
+          cron: "0 2 * * *"
+          filters:
+            branches:
+              only: master
+    jobs:
+      - build:
+          context: org-default-build
+      - sonar:
+          context: global
+          requires:
+            - build
+  main:
+    jobs:
+      - build:
+          context: org-default-build
+          filters:
+            branches:
+              only: master
+      - postBuild:
+          context: org-carbon
+          requires:
+            - build
+          filters:
+            branches:
+              only: master

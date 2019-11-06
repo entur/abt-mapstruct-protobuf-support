@@ -3,7 +3,12 @@ package no.entur.abt.mapstruct;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -89,6 +94,23 @@ public interface ProtobufStandardMappings {
 
 	default LocalTime mapTimeOfDay(com.google.type.TimeOfDay t) {
 		return LocalTime.of(t.getHours(), t.getMinutes(), t.getSeconds(), t.getNanos());
+	}
+
+	default Timestamp map(LocalDateTime i) {
+		if (i == null) {
+			return null;
+		}
+
+		TimeZone systemDefault = TimeZone.getDefault();
+
+		int offset = systemDefault.getOffset(GregorianCalendar.AD, i.getYear(), i.getMonthValue() - 1, i.getDayOfMonth(), i.getDayOfWeek().getValue(),
+				i.getNano() / 1000);
+
+		return Timestamp.newBuilder().setSeconds(i.toEpochSecond(ZoneOffset.ofTotalSeconds(offset / 1000))).setNanos(i.getNano()).build();
+	}
+
+	default Timestamp map(OffsetDateTime in) {
+		return Timestamp.newBuilder().setSeconds(in.toEpochSecond()).setNanos(0).build();
 	}
 
 }

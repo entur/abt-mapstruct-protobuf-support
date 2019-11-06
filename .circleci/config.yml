@@ -11,7 +11,7 @@ aliases:
       echo 'export CIRCLE_API_TOKEN="$CIRCLE_API_USER_TOKEN"' >> $BASH_ENV
       /tools/downstream_single_trigger.sh "bitbucket/enturas/abt-core" "master"
       /tools/downstream_single_trigger.sh "bitbucket/enturas/abt-referencedata" "master"
-      /tools/downstream_single_trigger.sh "bitbucket/enturas/abt-inspection-lib "master"
+      /tools/downstream_single_trigger.sh "bitbucket/enturas/abt-inspection-lib" "master"
 
   - &sonar-scan
     command: |

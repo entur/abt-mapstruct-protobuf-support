@@ -39,9 +39,6 @@ aliases:
 
         git add pom.xml
         git commit -m "release: $NEW_VERSION"
-
-        git checkout master
-        git merge --no-edit release
         git push origin master
 
         MAJ_VERSION=$(echo "$NEW_VERSION" | cut -d '.' -f 1)

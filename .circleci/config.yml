@@ -9,9 +9,9 @@ aliases:
     name: Trigger downstream builds
     command: |
       echo 'export CIRCLE_API_TOKEN="$CIRCLE_API_USER_TOKEN"' >> $BASH_ENV
-      /tools/downstream_single_trigger.sh "bitbucket/enturas/abt-core" "master"
-      /tools/downstream_single_trigger.sh "bitbucket/enturas/abt-referencedata" "master"
-      /tools/downstream_single_trigger.sh "bitbucket/enturas/abt-inspection-lib" "master"
+      /tools/downstream_single_trigger.sh "bitbucket/enturas/abt-core" "develop"
+      /tools/downstream_single_trigger.sh "bitbucket/enturas/abt-referencedata" "develop"
+      /tools/downstream_single_trigger.sh "bitbucket/enturas/abt-inspection-lib" "develop"
 
   - &sonar-scan
     command: |
@@ -115,9 +115,6 @@ commands:
 jobs:
   build:
     <<: *java-container-config
-
-    working_directory: ~/repo
-
     environment:
       MAVEN_OPTS: -Xmx1024m
 
@@ -139,12 +136,11 @@ jobs:
             - ~/.m2
           key: cache-dependencies-{{ checksum "pom.xml" }}
 
-      - run: mvn deploy -DskipTests
-
       - persist_to_workspace:
-          root: .
+          root: ../
           paths:
-            - target/
+            - project
+            - .m2
 
       - store_artifacts:
           path: target/dependency-check-report.html
@@ -161,9 +157,8 @@ jobs:
   sonar:
     <<: *java-container-config
     steps:
-      - checkout
       - attach_workspace:
-          at: .
+          at: ../
       - restore_cache:
           keys:
             - cache-dependencies-{{ checksum "pom.xml" }}
@@ -171,6 +166,59 @@ jobs:
 
       - run: *sonar-scan
 
+  deploy:
+    <<: *java-container-config
+    steps:
+      - attach_workspace:
+          at: ../
+      - restore_cache:
+          keys:
+            - cache-dependencies-{{ checksum "pom.xml" }}
+            - cache-dependencies-18012019
+
+      - run: mvn deploy -DskipTests
+
+  release:
+    <<: *java-container-config
+    steps:
+      - attach_workspace:
+          at: ../
+      - restore_cache:
+          keys:
+            - cache-dependencies-{{ checksum "pom.xml" }}
+            - cache-dependencies-18012019
+      - run:
+          - run:
+              name: New release
+              command: |
+                OLD_VERSION=$(mvn -q \
+                  -Dexec.executable="echo" -Dexec.args='${project.version}' \
+                  --non-recursive org.codehaus.mojo:exec-maven-plugin:1.6.0:exec)
+                NEW_VERSION="${OLD_VERSION/-SNAPSHOT/}"
+                echo "Releasing $OLD_VERSION as $NEW_VERSION"
+
+                mvn versions:use-releases
+
+                mvn versions:set -DnewVersion="$NEW_VERSION"
+
+                git add pom.xml
+                git commit -m "release: $NEW_VERSION"
+
+                git checkout master
+                git merge --no-edit release
+                git push origin master
+
+                MAJ_VERSION=$(echo "$NEW_VERSION" | cut -d '.' -f 1)
+                MIN_VERSION=$(echo "$NEW_VERSION" | cut -d '.' -f 2)
+                NEW_MINOR=$(($MIN_VERSION + 1))
+                DEV_VERSION="$MAJ_VERSION.$NEW_MINOR-SNAPSHOT"
+
+                git checkout develop
+                git merge --no-edit master
+                mvn versions:set -DnewVersion="$DEV_VERSION"
+                git add pom.xml
+                git commit -m "ready for development: $DEV_VERSION"
+                git push origin develop
 
 workflows:
   version: 2
@@ -180,7 +228,7 @@ workflows:
           cron: "0 2 * * *"
           filters:
             branches:
-              only: master
+              only: develop
     jobs:
       - build:
           context: org-default-build
@@ -194,11 +242,30 @@ workflows:
           context: org-default-build
           filters:
             branches:
-              only: master
+              only:
+              - master
+              - develop
       - postBuild:
           context: org-carbon
           requires:
             - build
           filters:
             branches:
+              only: develop
+      - release:
+          context: org-default-build
+          requires:
+            - build
+          filters:
+            branches:
               only: master
+      - deploy:
+          context: org-carbon
+          requires:
+            - release
+            - build
+          filters:
+            branches:
+              only:
+              - develop
+              - master

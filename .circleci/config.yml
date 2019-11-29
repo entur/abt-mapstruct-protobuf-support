@@ -21,6 +21,36 @@ aliases:
         -Dsonar.projectName=${CIRCLE_PROJECT_REPONAME} \
         -Dsonar.host.url=https://sonarcloud.io \
         -Dsonar.login=${ENTUR_SONAR_PASSWORD}
+  - &release
+      command: |
+        OLD_VERSION=$(mvn -q \
+          -Dexec.executable="echo" -Dexec.args='${project.version}' \
+          --non-recursive org.codehaus.mojo:exec-maven-plugin:1.6.0:exec)
+        NEW_VERSION="${OLD_VERSION/-SNAPSHOT/}"
+        echo "Releasing $OLD_VERSION as $NEW_VERSION"
+
+        mvn versions:use-releases
+
+        mvn versions:set -DnewVersion="$NEW_VERSION"
+
+        git add pom.xml
+        git commit -m "release: $NEW_VERSION"
+
+        git checkout master
+        git merge --no-edit release
+        git push origin master
+
+        MAJ_VERSION=$(echo "$NEW_VERSION" | cut -d '.' -f 1)
+        MIN_VERSION=$(echo "$NEW_VERSION" | cut -d '.' -f 2)
+        NEW_MINOR=$(($MIN_VERSION + 1))
+        DEV_VERSION="$MAJ_VERSION.$NEW_MINOR-SNAPSHOT"
+
+        git checkout develop
+        git merge --no-edit master
+        mvn versions:set -DnewVersion="$DEV_VERSION"
+        git add pom.xml
+        git commit -m "ready for development: $DEV_VERSION"
+        git push origin develop
 
   - &maven-settings-file
       "\"<settings xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.1.0 http://maven.apache.org/xsd/settings-1.1.0.xsd' xmlns='http://maven.apache.org/SETTINGS/1.1.0'
@@ -90,6 +120,7 @@ aliases:
         auth:
           username: _json_key
           password: $GCLOUD_SERVICE_KEY
+
 
 commands:
   generate-maven-settings-file:
@@ -187,38 +218,8 @@ jobs:
           keys:
             - cache-dependencies-{{ checksum "pom.xml" }}
             - cache-dependencies-18012019
-      - run:
-          - run:
-              name: New release
-              command: |
-                OLD_VERSION=$(mvn -q \
-                  -Dexec.executable="echo" -Dexec.args='${project.version}' \
-                  --non-recursive org.codehaus.mojo:exec-maven-plugin:1.6.0:exec)
-                NEW_VERSION="${OLD_VERSION/-SNAPSHOT/}"
-                echo "Releasing $OLD_VERSION as $NEW_VERSION"
+      - run: *release
 
-                mvn versions:use-releases
-
-                mvn versions:set -DnewVersion="$NEW_VERSION"
-
-                git add pom.xml
-                git commit -m "release: $NEW_VERSION"
-
-                git checkout master
-                git merge --no-edit release
-                git push origin master
-
-                MAJ_VERSION=$(echo "$NEW_VERSION" | cut -d '.' -f 1)
-                MIN_VERSION=$(echo "$NEW_VERSION" | cut -d '.' -f 2)
-                NEW_MINOR=$(($MIN_VERSION + 1))
-                DEV_VERSION="$MAJ_VERSION.$NEW_MINOR-SNAPSHOT"
-
-                git checkout develop
-                git merge --no-edit master
-                mvn versions:set -DnewVersion="$DEV_VERSION"
-                git add pom.xml
-                git commit -m "ready for development: $DEV_VERSION"
-                git push origin develop
 
 workflows:
   version: 2

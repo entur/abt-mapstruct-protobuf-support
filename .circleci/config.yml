@@ -25,6 +25,7 @@ aliases:
   - &release
       name: Release
       command: |
+        # Need write access to git for this to work:
         OLD_VERSION=$(mvn -q \
           -Dexec.executable="echo" -Dexec.args='${project.version}' \
           --non-recursive org.codehaus.mojo:exec-maven-plugin:1.6.0:exec)
@@ -253,7 +254,7 @@ workflows:
       - postBuild:
           context: org-carbon
           requires:
-            - build
+            - deploy
           filters:
             branches:
               only: develop

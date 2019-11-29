@@ -14,7 +14,7 @@ aliases:
       /tools/downstream_single_trigger.sh "bitbucket/enturas/abt-inspection-lib" "develop"
 
   - &sonar-scan
-    name: Release
+    name: Sonar
     command: |
       mvn sonar:sonar \
         -Dsonar.projectKey=enturas_${CIRCLE_PROJECT_REPONAME} \
@@ -23,6 +23,7 @@ aliases:
         -Dsonar.host.url=https://sonarcloud.io \
         -Dsonar.login=${ENTUR_SONAR_PASSWORD}
   - &release
+      name: Release
       command: |
         OLD_VERSION=$(mvn -q \
           -Dexec.executable="echo" -Dexec.args='${project.version}' \
@@ -40,6 +41,7 @@ aliases:
         git add pom.xml
         git commit -m "release: $NEW_VERSION"
         git push origin master
+        echo "Pushed $NEW_VERSION to master"
 
         MAJ_VERSION=$(echo "$NEW_VERSION" | cut -d '.' -f 1)
         MIN_VERSION=$(echo "$NEW_VERSION" | cut -d '.' -f 2)
@@ -52,6 +54,8 @@ aliases:
         git add pom.xml
         git commit -m "ready for development: $DEV_VERSION"
         git push origin develop
+        echo "Pushed $DEV_VERSION to develop"
+
 
   - &maven-settings-file
       "\"<settings xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.1.0 http://maven.apache.org/xsd/settings-1.1.0.xsd' xmlns='http://maven.apache.org/SETTINGS/1.1.0'

@@ -34,12 +34,6 @@ aliases:
         mvn versions:use-releases
 
         mvn versions:set -DnewVersion="$NEW_VERSION"
-        mkdir -p $HOME/.ssh
-        touch $HOME/.ssh/known_hosts
-        ssh-keyscan bitbucket.org >> $HOME/.ssh/known_hosts
-        git config user.name "circleci release"
-        git config user.email "circleci@entur.org"
-
         git add pom.xml
         git commit -m "release: $NEW_VERSION"
         git push origin master
@@ -219,6 +213,7 @@ jobs:
   release:
     <<: *java-container-config
     steps:
+      - checkout
       - attach_workspace:
           at: ../
       - restore_cache:

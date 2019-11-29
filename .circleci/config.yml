@@ -35,6 +35,7 @@ aliases:
 
         mvn versions:set -DnewVersion="$NEW_VERSION"
 
+        ssh-keyscan bitbucket.org >> $HOME/.ssh/known_hosts
         git config user.name "circleci release"
         git config user.email "circleci@entur.org"
 

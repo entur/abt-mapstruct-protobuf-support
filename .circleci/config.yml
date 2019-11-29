@@ -34,6 +34,8 @@ aliases:
         mvn versions:use-releases
 
         mvn versions:set -DnewVersion="$NEW_VERSION"
+        git config --global user.email "circleci@entur.no"
+        git config --global user.name "circleci"
         git add pom.xml
         git commit -m "release: $NEW_VERSION"
         git push origin master

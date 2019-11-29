@@ -33,6 +33,9 @@ aliases:
 
         mvn versions:set -DnewVersion="$NEW_VERSION"
 
+        git config user.name "circleci release"
+        git config user.email "circleci@entur.org"
+
         git add pom.xml
         git commit -m "release: $NEW_VERSION"
 

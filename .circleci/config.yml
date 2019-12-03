@@ -9,9 +9,9 @@ aliases:
     name: Trigger downstream builds
     command: |
       echo 'export CIRCLE_API_TOKEN="$CIRCLE_API_USER_TOKEN"' >> $BASH_ENV
-      /tools/downstream_single_trigger.sh "bitbucket/enturas/abt-core" "develop"
-      /tools/downstream_single_trigger.sh "bitbucket/enturas/abt-referencedata" "develop"
-      /tools/downstream_single_trigger.sh "bitbucket/enturas/abt-inspection-lib" "develop"
+      /tools/downstream_single_trigger.sh "gh/entur/abt-core" "develop"
+      /tools/downstream_single_trigger.sh "gh/entur/abt-referencedata" "develop"
+      /tools/downstream_single_trigger.sh "gh/entur/abt-inspection-lib" "develop"
 
   - &sonar-scan
     name: Sonar

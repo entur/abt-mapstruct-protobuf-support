@@ -247,7 +247,7 @@ workflows:
               only: develop
     jobs:
       - build:
-          context: org-default-build
+          context: global
       - sonar:
           context: global
           requires:
@@ -255,7 +255,7 @@ workflows:
   main:
     jobs:
       - build:
-          context: org-default-build
+          context: global
           filters:
             branches:
               only:
@@ -269,7 +269,7 @@ workflows:
             branches:
               only: develop
       - release:
-          context: org-default-build
+          context: global
           requires:
             - build
           filters:

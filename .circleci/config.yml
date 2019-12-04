@@ -247,15 +247,15 @@ workflows:
               only: develop
     jobs:
       - build:
-          context: org-carbon
+          context: org-default-build
       - sonar:
-          context: org-carbon
+          context: org-default-build
           requires:
             - build
   main:
     jobs:
       - build:
-          context: org-carbon
+          context: org-default-build
           filters:
             branches:
               only:
@@ -269,7 +269,7 @@ workflows:
             branches:
               only: develop
       - release:
-          context: org-carbon
+          context: org-default-build
           requires:
             - build
           filters:

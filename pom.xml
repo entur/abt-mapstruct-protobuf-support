@@ -26,14 +26,6 @@
         </developer>
     </developers>
 
-    <scm>
-        <connection>scm:git:ssh://git@bitbucket.org:enturas/abt-mapstruct-protobuf-support.git</connection>
-        <developerConnection>scm:git:ssh://git@bitbucket.org:enturas/abt-mapstruct-protobuf-support.git
-        </developerConnection>
-        <url>https://bitbucket.org/enturas/abt-mapstruct-protobuf-support/src/master/</url>
-        <tag>HEAD</tag>
-    </scm>
-
     <inceptionYear>2019</inceptionYear>
 
     <organization>

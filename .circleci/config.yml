@@ -17,7 +17,7 @@ aliases:
     name: Sonar
     command: |
       mvn sonar:sonar \
-        -Dsonar.projectKey=enturas_${CIRCLE_PROJECT_REPONAME} \
+        -Dsonar.projectKey=entur_${CIRCLE_PROJECT_REPONAME} \
         -Dsonar.organization=${SONAR_ORG} \
         -Dsonar.projectName=${CIRCLE_PROJECT_REPONAME} \
         -Dsonar.host.url=https://sonarcloud.io \
@@ -249,7 +249,7 @@ workflows:
       - build:
           context: org-default-build
       - sonar:
-          context: org-default-build
+          context: org-carbon
           requires:
             - build
   main:

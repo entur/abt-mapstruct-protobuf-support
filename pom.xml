@@ -46,6 +46,11 @@
         </snapshotRepository>
     </distributionManagement>
 
+    <scm>
+        <connection>scm:git:ssh://git@github.com/entur/abt-mapstruct-protobuf-support.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/entur/abt-mapstruct-protobuf-support.git</developerConnection>
+    </scm>
+
 
     <properties>
         <spotless.version>1.23.0</spotless.version>
@@ -170,6 +175,18 @@
                             <groupId>no.entur</groupId>
                             <artifactId>abt-codestyle</artifactId>
                             <version>0.0.1-SNAPSHOT</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+                <plugin>
+                    <groupId>com.itemis.maven.plugins</groupId>
+                    <artifactId>unleash-maven-plugin</artifactId>
+                    <version>2.10.0</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.itemis.maven.plugins</groupId>
+                            <artifactId>unleash-scm-provider-git</artifactId>
+                            <version>2.3.0</version>
                         </dependency>
                     </dependencies>
                 </plugin>

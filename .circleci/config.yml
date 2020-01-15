@@ -24,7 +24,7 @@ aliases:
         -Dsonar.login=${ENTUR_SONAR_PASSWORD}
   - &release
     name: Release
-      command: |
+    command: |
         if [ "$(git log -1 --pretty=%B)" == "Start release" ]
         then
           echo "Start release"

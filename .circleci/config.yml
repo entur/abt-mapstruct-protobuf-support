@@ -23,19 +23,21 @@ aliases:
         -Dsonar.host.url=https://sonarcloud.io \
         -Dsonar.login=${ENTUR_SONAR_PASSWORD}
   - &release
-      name: Release
-      command: |
+    name: Release
+    command: |
         if [ "$(git log -1 --pretty=%B)" == "Start release" ]
         then
           echo "Start release"
+          mvn versions:use-releases
           SNAPSHOT_VERSION=$(mvn -q -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive org.codehaus.mojo:exec-maven-plugin:1.6.0:exec)
           TAG_VERSION="${SNAPSHOT_VERSION/-SNAPSHOT/}"
           echo "Release version $TAG_VERSION"
-
           mvn unleash:perform -B
+          git config --global user.email "circleci@entur.no"
+          git config --global user.name "circleci"
           git checkout master
           git fetch --tags origin
-          git merge $TAG_VERSION
+          git merge --no-edit $TAG_VERSION
           git push origin master
         else
           echo "Skipping release"
@@ -232,11 +234,6 @@ workflows:
     jobs:
       - build:
           context: org-default-build
-          filters:
-            branches:
-              only:
-              - master
-              - develop
       - postBuild:
           context: org-carbon
           requires:
@@ -259,4 +256,3 @@ workflows:
             branches:
               only:
               - develop
-              - master

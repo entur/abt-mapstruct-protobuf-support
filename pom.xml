@@ -36,13 +36,13 @@
     <distributionManagement>
         <repository>
             <id>releases</id>
-            <name>entur-team-kontobasert-billettering-release</name>
-            <url>https://entur2.jfrog.io/entur2/entur-team-kontobasert-billettering-release</url>
+            <name>partner-release</name>
+            <url>https://entur2.jfrog.io/entur2/partner-release</url>
         </repository>
         <snapshotRepository>
             <id>snapshots</id>
-            <name>entur2-snapshots</name>
-            <url>https://entur2.jfrog.io/entur2/libs-snapshot-local</url>
+            <name>partner-snapshots</name>
+            <url>https://entur2.jfrog.io/entur2/partner-snapshot</url>
         </snapshotRepository>
     </distributionManagement>
 

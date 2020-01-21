@@ -69,7 +69,7 @@
         <repository>
             <id>snapshots</id>
             <name>libs-snapshot</name>
-            <url>https://entur2.jfrog.io/entur2/libs-snapshot</url>
+            <url>https://entur2.jfrog.io/entur2/partner-snapshot</url>
         </repository>
     </repositories>
 

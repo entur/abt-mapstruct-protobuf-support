@@ -25,81 +25,87 @@ aliases:
   - &release
     name: Release
     command: |
-        if [ "$(git log -1 --pretty=%B)" == "Start release" ]
-        then
-          echo "Start release"
-          mvn versions:use-releases
-          SNAPSHOT_VERSION=$(mvn -q -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive org.codehaus.mojo:exec-maven-plugin:1.6.0:exec)
-          TAG_VERSION="${SNAPSHOT_VERSION/-SNAPSHOT/}"
-          echo "Release version $TAG_VERSION"
-          mvn unleash:perform -B
-          git config --global user.email "circleci@entur.no"
-          git config --global user.name "circleci"
-          git checkout master
-          git fetch --tags origin
-          git merge --no-edit $TAG_VERSION
-          git push origin master
-        else
-          echo "Skipping release"
-        fi
+      if [ "$(git log -1 --pretty=%B)" == "Start release" ]
+      then
+        echo "Start release"
+        git config --global user.email "circleci@entur.no"
+        git config --global user.name "circleci"
+        git checkout master
+        git pull --no-edit
+        git checkout develop
+        mvn versions:use-releases
+        mvn gitflow:release-start gitflow:release-finish -Prelease -DpostReleaseGoals=deploy -DargLine=-Prelease -B
+      else
+        echo "Skipping release"
+      fi
+
+  - &import_gpg_key
+    name: Configure GPG private key for signing project artifacts in OSS Sonatype
+    command: |
+      echo $SONATYPE_GPG_KEY_BASE64 | base64 --decode | gpg --batch --no-tty --import --yes
 
 
   - &maven-settings-file
       "\"<settings xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.1.0 http://maven.apache.org/xsd/settings-1.1.0.xsd' xmlns='http://maven.apache.org/SETTINGS/1.1.0'
-            xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'>
-          <servers>
-            <server>
-              <username>$entur_artifactory_user</username>
-              <password>$entur_artifactory_password</password>
-              <id>central</id>
-            </server>
-            <server>
-              <username>$entur_artifactory_user</username>
-              <password>$entur_artifactory_password</password>
-              <id>snapshots</id>
-            </server>
-          </servers>
-          <profiles>
-      <profile>
-        <repositories>
-          <repository>
-            <snapshots>
-              <enabled>false</enabled>
-            </snapshots>
-            <id>central</id>
-            <name>entur-team-kontobasert-billettering-release</name>
-            <url>https://entur2.jfrog.io/entur2/entur-team-kontobasert-billettering-release</url>
-          </repository>
-          <repository>
-            <snapshots />
-            <id>snapshots</id>
-            <name>entur-team-kontobasert-billettering-snapshot</name>
-            <url>https://entur2.jfrog.io/entur2/entur-team-kontobasert-billettering-snapshot</url>
-          </repository>
-        </repositories>
-        <pluginRepositories>
-          <pluginRepository>
-            <snapshots>
-              <enabled>false</enabled>
-            </snapshots>
-            <id>central</id>
-            <name>entur-team-kontobasert-billettering-release</name>
-            <url>https://entur2.jfrog.io/entur2/entur-team-kontobasert-billettering-release</url>
-          </pluginRepository>
-          <pluginRepository>
-            <snapshots />
-            <id>snapshots</id>
-            <name>entur-team-kontobasert-billettering-snapshot</name>
-            <url>https://entur2.jfrog.io/entur2/entur-team-kontobasert-billettering-snapshot</url>
-          </pluginRepository>
-        </pluginRepositories>
-        <id>artifactory</id>
-      </profile>
-          </profiles>
-          <activeProfiles>
-            <activeProfile>artifactory</activeProfile>
-          </activeProfiles>
-        </settings>\""
+                  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'>
+                <servers>
+                <server>
+                       <username>$SONATYPE_USERNAME</username>
+                       <password>$SONATYPE_PASSWORD</password>
+                       <id>ossrh</id>
+                     </server>
+                  <server>
+                    <username>$entur_artifactory_user</username>
+                    <password>$entur_artifactory_password</password>
+                    <id>central</id>
+                  </server>
+                  <server>
+                    <username>$entur_artifactory_user</username>
+                    <password>$entur_artifactory_password</password>
+                    <id>snapshots</id>
+                  </server>
+                </servers>
+                <profiles>
+            <profile>
+              <repositories>
+                <repository>
+                  <snapshots>
+                    <enabled>false</enabled>
+                  </snapshots>
+                  <id>central</id>
+                  <name>entur-team-kontobasert-billettering-release</name>
+                  <url>https://entur2.jfrog.io/entur2/entur-team-kontobasert-billettering-release</url>
+                </repository>
+                <repository>
+                  <snapshots />
+                  <id>snapshots</id>
+                  <name>entur-team-kontobasert-billettering-snapshot</name>
+                  <url>https://entur2.jfrog.io/entur2/entur-team-kontobasert-billettering-snapshot</url>
+                </repository>
+              </repositories>
+              <pluginRepositories>
+                <pluginRepository>
+                  <snapshots>
+                    <enabled>false</enabled>
+                  </snapshots>
+                  <id>central</id>
+                  <name>entur-team-kontobasert-billettering-release</name>
+                  <url>https://entur2.jfrog.io/entur2/entur-team-kontobasert-billettering-release</url>
+                </pluginRepository>
+                <pluginRepository>
+                  <snapshots />
+                  <id>snapshots</id>
+                  <name>entur-team-kontobasert-billettering-snapshot</name>
+                  <url>https://entur2.jfrog.io/entur2/entur-team-kontobasert-billettering-snapshot</url>
+                </pluginRepository>
+              </pluginRepositories>
+              <id>artifactory</id>
+            </profile>
+                </profiles>
+                <activeProfiles>
+                  <activeProfile>artifactory</activeProfile>
+                </activeProfiles>
+              </settings>\""
 
 
   - &java-container-config
@@ -205,6 +211,7 @@ jobs:
     <<: *java-container-config
     steps:
       - checkout
+      - run: *import_gpg_key
       - attach_workspace:
           at: ../
       - restore_cache:

@@ -34,26 +34,15 @@ aliases:
         git pull --no-edit
         git checkout develop
         mvn versions:use-releases
-        mvn gitflow:release-start gitflow:release-finish -Prelease -DpostReleaseGoals=deploy -DargLine=-Prelease -B
+        mvn gitflow:release-start gitflow:release-finish -DpostReleaseGoals=deploy -B
       else
         echo "Skipping release"
       fi
-
-  - &import_gpg_key
-    name: Configure GPG private key for signing project artifacts in OSS Sonatype
-    command: |
-      echo $SONATYPE_GPG_KEY_BASE64 | base64 --decode | gpg --batch --no-tty --import --yes
-
 
   - &maven-settings-file
       "\"<settings xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.1.0 http://maven.apache.org/xsd/settings-1.1.0.xsd' xmlns='http://maven.apache.org/SETTINGS/1.1.0'
                   xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'>
                 <servers>
-                <server>
-                       <username>$SONATYPE_USERNAME</username>
-                       <password>$SONATYPE_PASSWORD</password>
-                       <id>ossrh</id>
-                     </server>
                   <server>
                     <username>$entur_artifactory_user</username>
                     <password>$entur_artifactory_password</password>
@@ -211,7 +200,6 @@ jobs:
     <<: *java-container-config
     steps:
       - checkout
-      - run: *import_gpg_key
       - attach_workspace:
           at: ../
       - restore_cache:

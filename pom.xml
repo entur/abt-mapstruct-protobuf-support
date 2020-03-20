@@ -60,7 +60,7 @@
         <entur.logging.version>1.0.16-SNAPSHOT</entur.logging.version>
         <juniper.version>5.5.1</juniper.version>
         <org.mapstruct.version>1.3.1.Final</org.mapstruct.version>
-        <protobuf.mapstruct.spi.version>1.0.0-SNAPSHOT</protobuf.mapstruct.spi.version>
+        <protobuf.mapstruct.spi.version>1.0.1-SNAPSHOT</protobuf.mapstruct.spi.version>
     </properties>
 
     <repositories>

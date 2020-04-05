@@ -62,14 +62,14 @@ aliases:
             <enabled>false</enabled>
           </snapshots>
           <id>central</id>
-          <name>entur-team-kontobasert-billettering-release</name>
-          <url>$entur_artifactory_contextUrl/entur-team-kontobasert-billettering-release</url>
+          <name>partnerrelease</name>
+          <url>$entur_artifactory_contextUrl/partnerrelease</url>
         </repository>
         <repository>
           <snapshots />
           <id>snapshots</id>
-          <name>entur-team-kontobasert-billettering-snapshot</name>
-          <url>$entur_artifactory_contextUrl/entur-team-kontobasert-billettering-snapshot</url>
+          <name>partnersnapshot</name>
+          <url>$entur_artifactory_contextUrl/partnersnapshot</url>
         </repository>
       </repositories>
       <pluginRepositories>
@@ -78,35 +78,27 @@ aliases:
             <enabled>false</enabled>
           </snapshots>
           <id>central</id>
-          <name>entur-team-kontobasert-billettering-release</name>
-          <url>$entur_artifactory_contextUrl/entur-team-kontobasert-billettering-release</url>
+          <name>partnerrelease</name>
+          <url>$entur_artifactory_contextUrl/partnerrelease</url>
         </pluginRepository>
         <pluginRepository>
           <snapshots />
           <id>snapshots</id>
-          <name>entur-team-kontobasert-billettering-snapshot</name>
-          <url>$entur_artifactory_contextUrl/entur-team-kontobasert-billettering-snapshot</url>
+          <name>partnersnapshot</name>
+          <url>$entur_artifactory_contextUrl/partnersnapshot</url>
         </pluginRepository>
       </pluginRepositories>
-      <distributionManagement>
-         <snapshotRepository>
-           <id>snapshots</id>
-           <name>Partner snapshots</name>
-           <url>$entur_artifactory_contextUrl/partner-snapshot-local</url>
-         </snapshotRepository>
-         <repository>
-           <id>releases</id>
-           <name>Partner releases</name>
-           <url>$entur_artifactory_contextUrl/partner-release-local</url>
-         </repository>
-      </distributionManagement>
-      <id>artifactory</id>
+      <properties>
+        <entur_artifactory_partner_publish_snapshot_url>$entur_artifactory_contextUrl/partner-snapshot-local</entur_artifactory_partner_publish_snapshot_url>
+        <entur_artifactory_partner_publish_release_url>$entur_artifactory_contextUrl/partner-release-local</entur_artifactory_partner_publish_release_url>
+      </properties>
+      <id>entur-partner</id>
     </profile>
-  </profiles>
-  <activeProfiles>
-    <activeProfile>artifactory</activeProfile>
-   </activeProfiles>
-      </settings>\""
+    </profiles>
+    <activeProfiles>
+        <activeProfile>entur-partner</activeProfile>
+    </activeProfiles>
+    </settings>\""
 
   - &java-container-config
     docker:

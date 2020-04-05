@@ -252,19 +252,17 @@
                 </plugins>
             </build>
         </profile>
-        <profile>
-            <distributionManagement>
-                <repository>
-                    <id>central</id>
-                    <url>${entur_artifactory_partner_publish_release_url}</url>
-                </repository>
-                <snapshotRepository>
-                    <id>snapshots</id>
-                    <url>${entur_artifactory_partner_publish_snapshot_url}</url>
-                </snapshotRepository>
-            </distributionManagement>
-
-            <id>entur-partner</id>
-        </profile>
     </profiles>
+
+    <distributionManagement>
+        <repository>
+            <id>central</id>
+            <url>${entur_artifactory_partner_publish_release_url}</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <url>${entur_artifactory_partner_publish_snapshot_url}</url>
+        </snapshotRepository>
+    </distributionManagement>
+
 </project>

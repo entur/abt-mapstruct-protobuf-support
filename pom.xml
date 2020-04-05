@@ -256,11 +256,11 @@
 
     <distributionManagement>
         <repository>
-            <id>central</id>
+            <id>entur-releases</id>
             <url>${entur_artifactory_partner_publish_release_url}</url>
         </repository>
         <snapshotRepository>
-            <id>snapshots</id>
+            <id>entur-snapshots</id>
             <url>${entur_artifactory_partner_publish_snapshot_url}</url>
         </snapshotRepository>
     </distributionManagement>

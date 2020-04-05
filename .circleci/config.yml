@@ -40,60 +40,56 @@ aliases:
       fi
 
   - &maven-settings-file
-    "\"<settings xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.1.0 http://maven.apache.org/xsd/settings-1.1.0.xsd' xmlns='http://maven.apache.org/SETTINGS/1.1.0'
-          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'>
-        <servers>
-          <server>
-            <username>$entur_artifactory_user</username>
-            <password>$entur_artifactory_password</password>
-            <id>central</id>
-          </server>
-          <server>
-            <username>$entur_artifactory_user</username>
-            <password>$entur_artifactory_password</password>
-            <id>snapshots</id>
-          </server>
-        </servers>
-  <profiles>
-    <profile>
-      <repositories>
-        <repository>
-          <snapshots>
-            <enabled>false</enabled>
-          </snapshots>
-          <id>central</id>
-          <name>partnerrelease</name>
-          <url>$entur_artifactory_contextUrl/partnerrelease</url>
-        </repository>
-        <repository>
-          <snapshots />
-          <id>snapshots</id>
-          <name>partnersnapshot</name>
-          <url>$entur_artifactory_contextUrl/partnersnapshot</url>
-        </repository>
-      </repositories>
-      <pluginRepositories>
-        <pluginRepository>
-          <snapshots>
-            <enabled>false</enabled>
-          </snapshots>
-          <id>central</id>
-          <name>partnerrelease</name>
-          <url>$entur_artifactory_contextUrl/partnerrelease</url>
-        </pluginRepository>
-        <pluginRepository>
-          <snapshots />
-          <id>snapshots</id>
-          <name>partnersnapshot</name>
-          <url>$entur_artifactory_contextUrl/partnersnapshot</url>
-        </pluginRepository>
-      </pluginRepositories>
-      <properties>
-        <entur_artifactory_partner_publish_snapshot_url>$entur_artifactory_contextUrl/partner-snapshot-local</entur_artifactory_partner_publish_snapshot_url>
-        <entur_artifactory_partner_publish_release_url>$entur_artifactory_contextUrl/partner-release-local</entur_artifactory_partner_publish_release_url>
-      </properties>
-      <id>entur-partner</id>
-    </profile>
+      "\"<settings xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.1.0 http://maven.apache.org/xsd/settings-1.1.0.xsd' xmlns='http://maven.apache.org/SETTINGS/1.1.0'
+            xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'>
+          <servers>
+            <server>
+              <username>$entur_artifactory_user</username>
+              <password>$entur_artifactory_password</password>
+              <id>entur-releases</id>
+            </server>
+            <server>
+              <username>$entur_artifactory_user</username>
+              <password>$entur_artifactory_password</password>
+              <id>entur-snapshots</id>
+            </server>
+          </servers>
+          <profiles>
+      <profile>
+        <repositories>
+          <repository>
+            <snapshots>
+              <enabled>false</enabled>
+            </snapshots>
+            <id>entur-releases</id>
+            <url>https://entur2.jfrog.io/entur2/partner-release</url>
+          </repository>
+          <repository>
+            <snapshots />
+            <id>entur-snapshots</id>
+            <url>https://entur2.jfrog.io/entur2/partner-snapshot</url>
+          </repository>
+        </repositories>
+        <pluginRepositories>
+          <pluginRepository>
+            <snapshots>
+              <enabled>false</enabled>
+            </snapshots>
+            <id>entur-releases</id>
+            <url>https://entur2.jfrog.io/entur2/partner-release</url>
+          </pluginRepository>
+          <pluginRepository>
+            <snapshots />
+            <id>entur-snapshots</id>
+            <url>https://entur2.jfrog.io/entur2/partner-snapshot</url>
+          </pluginRepository>
+        </pluginRepositories>
+        <properties>
+          <entur_artifactory_partner_publish_snapshot_url>$entur_artifactory_contextUrl/partner-snapshot-local</entur_artifactory_partner_publish_snapshot_url>
+          <entur_artifactory_partner_publish_release_url>$entur_artifactory_contextUrl/partner-release-local</entur_artifactory_partner_publish_release_url>
+        </properties>
+        <id>entur-partner</id>
+      </profile>
     </profiles>
     <activeProfiles>
         <activeProfile>entur-partner</activeProfile>

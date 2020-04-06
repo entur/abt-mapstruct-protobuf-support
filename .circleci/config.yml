@@ -85,6 +85,8 @@ aliases:
           </pluginRepository>
         </pluginRepositories>
         <properties>
+          <entur_artifactory_partner_publish_snapshot_server_id>entur-snapshots</entur_artifactory_partner_publish_snapshot_server_id>
+          <entur_artifactory_partner_publish_release_server_id>entur-releases</entur_artifactory_partner_publish_release_server_id>
           <entur_artifactory_partner_publish_snapshot_url>$entur_artifactory_contextUrl/partner-snapshot-local</entur_artifactory_partner_publish_snapshot_url>
           <entur_artifactory_partner_publish_release_url>$entur_artifactory_contextUrl/partner-release-local</entur_artifactory_partner_publish_release_url>
         </properties>

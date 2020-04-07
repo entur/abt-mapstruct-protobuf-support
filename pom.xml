@@ -33,17 +33,6 @@
         <url>http://www.entur.org/</url>
     </organization>
 
-    <distributionManagement>
-        <repository>
-            <id>releases</id>
-            <url>https://entur2.jfrog.io/entur2/partner-release-local</url>
-        </repository>
-        <snapshotRepository>
-            <id>snapshots</id>
-            <url>https://entur2.jfrog.io/entur2/partner-snapshot-local</url>
-        </snapshotRepository>
-    </distributionManagement>
-
     <scm>
         <connection>scm:git:ssh://git@github.com/entur/abt-mapstruct-protobuf-support.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/entur/abt-mapstruct-protobuf-support.git</developerConnection>
@@ -62,20 +51,6 @@
         <org.mapstruct.version>1.3.1.Final</org.mapstruct.version>
         <protobuf.mapstruct.spi.version>1.0.1-SNAPSHOT</protobuf.mapstruct.spi.version>
     </properties>
-
-    <repositories>
-        <repository>
-            <id>releases</id>
-            <url>https://entur2.jfrog.io/entur2/partner-release</url>
-        </repository>
-        <repository>
-            <id>snapshots</id>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <url>https://entur2.jfrog.io/entur2/partner-snapshot</url>
-        </repository>
-    </repositories>
 
     <dependencies>
         <dependency>
@@ -278,4 +253,16 @@
             </build>
         </profile>
     </profiles>
+
+    <distributionManagement>
+        <repository>
+            <id>${entur_artifactory_partner_publish_release_server_id}</id>
+            <url>${entur_artifactory_partner_publish_release_url}</url>
+        </repository>
+        <snapshotRepository>
+            <id>${entur_artifactory_partner_publish_snapshot_server_id}</id>
+            <url>${entur_artifactory_partner_publish_snapshot_url}</url>
+        </snapshotRepository>
+    </distributionManagement>
+
 </project>

@@ -107,7 +107,7 @@ aliases:
       - image: eu.gcr.io/entur-system-1287/circleci-toolbox-image
         auth:
           username: _json_key
-          password: $GCLOUD_SERVICE_KEY
+          password: $DOCKER_PASSWORD
 
 
 commands:

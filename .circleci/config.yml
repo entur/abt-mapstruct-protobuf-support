@@ -192,6 +192,8 @@ jobs:
             - cache-dependencies-18012019
       - run: *release
 
+orbs:
+  queue: eddiewebb/queue@volatile
 
 workflows:
   version: 2
@@ -211,8 +213,15 @@ workflows:
             - build
   main:
     jobs:
+      - queue/block_workflow:
+          only-on-branch: develop
+          time: '30'
+          circleci-api-key: CIRCLE_API_USER_TOKEN
+          context: global
       - build:
           context: global
+          requires:
+            - queue/block_workflow
       - postBuild:
           context: global
           requires:

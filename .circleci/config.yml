@@ -143,7 +143,7 @@ jobs:
       - restore_cache:
           keys:
             - cache-dependencies-{{ checksum "pom.xml" }}
-            - cache-dependencies-abt-referencedata-11012019
+            - cache-dependencies-abt-referencedatacache-11012019
 
       - generate-maven-settings-file:
           settings-file: *maven-settings-file

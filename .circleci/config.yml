@@ -25,14 +25,19 @@ aliases:
   - &release
     name: Release
     command: |
-        echo "Start release"
-        git config --global user.email "circleci@entur.no"
-        git config --global user.name "circleci"
-        git checkout master
-        git pull --no-edit
-        git checkout develop
-        mvn versions:use-releases
-        mvn gitflow:release-start gitflow:release-finish -DpostReleaseGoals=deploy -B
+      if [ "$(git log -n 1 --pretty="%an")" == "Renovate Bot" ]
+      then
+        echo "Skipping release"
+      else
+      echo "Start release"
+      git config --global user.email "circleci@entur.no"
+      git config --global user.name "circleci"
+      git checkout master
+      git pull --no-edit
+      git checkout develop
+      mvn versions:use-releases
+      mvn gitflow:release-start gitflow:release-finish -DpostReleaseGoals=deploy -B
+      fi
 
   - &maven-settings-file
       "\"<settings xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.1.0 http://maven.apache.org/xsd/settings-1.1.0.xsd' xmlns='http://maven.apache.org/SETTINGS/1.1.0'

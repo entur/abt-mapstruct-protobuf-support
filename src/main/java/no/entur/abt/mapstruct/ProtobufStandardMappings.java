@@ -46,7 +46,7 @@ public interface ProtobufStandardMappings {
 	}
 
 	default Instant mapToInstant(Timestamp t) {
-		if (t == null || t.getSeconds() == 0) {
+		if (t == null || (t.getSeconds() == 0 && t.getNanos() == 0)) {
 			return null;
 		}
 		return Instant.ofEpochSecond(t.getSeconds(), t.getNanos());

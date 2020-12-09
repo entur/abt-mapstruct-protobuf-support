@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>no.entur.abt</groupId>
     <artifactId>mapstruct-protobuf-support</artifactId>
-    <version>1.14</version>
+    <version>1.15</version>
     <packaging>jar</packaging>
     <name>Standard default mapping for often used types</name>
     <properties>
@@ -15,8 +15,8 @@
         <org.mapstruct.version>1.4.1.Final</org.mapstruct.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <protobuf.mapstruct.spi.version>1.7</protobuf.mapstruct.spi.version>
-        <spotless.version>2.5.0</spotless.version>
+        <protobuf.mapstruct.spi.version>1.8</protobuf.mapstruct.spi.version>
+        <spotless.version>2.6.1</spotless.version>
     </properties>
     <dependencies>
         <dependency>
@@ -25,21 +25,23 @@
             <version>${org.mapstruct.version}</version>
         </dependency>
         <dependency>
+            <groupId>no.entur.abt</groupId>
+            <artifactId>abt-protobuf-java</artifactId>
+            <version>2.92</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <version>${juniper.version}</version>
+            <scope>test</scope>
         </dependency>
         <!-- and the engine for surefire and failsafe -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
             <version>${juniper.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>no.entur.abt</groupId>
-            <artifactId>abt-protobuf-java</artifactId>
-            <version>2.58</version>
-            <scope>provided</scope>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     <build>
@@ -68,14 +70,14 @@
                         <dependency>
                             <groupId>no.entur</groupId>
                             <artifactId>abt-codestyle</artifactId>
-                            <version>0.3</version>
+                            <version>0.8</version>
                         </dependency>
                     </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>com.amashchenko.maven.plugin</groupId>
                     <artifactId>gitflow-maven-plugin</artifactId>
-                    <version>1.14.0</version>
+                    <version>1.15.0</version>
                     <configuration>
                         <commitMessagePrefix>[ci skip]</commitMessagePrefix>
                         <allowSnapshots>false</allowSnapshots>

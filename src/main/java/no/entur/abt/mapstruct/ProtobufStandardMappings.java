@@ -77,7 +77,7 @@ public interface ProtobufStandardMappings {
 	}
 
 	default com.google.protobuf.Duration mapDuration(Duration t) {
-		return com.google.protobuf.Duration.newBuilder().setSeconds(t.toMillis() / 1000).setNanos(t.toNanosPart()).build();
+		return com.google.protobuf.Duration.newBuilder().setSeconds(t.toMillis() / 1000).setNanos(t.getNano()).build();
 	}
 
 	default com.google.type.Date mapLocalDate(LocalDate t) {
